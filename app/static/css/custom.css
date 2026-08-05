@@ -1,0 +1,8 @@
+/* Botones grandes, pensados para uso en tablet/celular en bodega y caja. */
+.btn-lg {
+  min-height: 48px;
+}
+
+body {
+  background-color: #f7f5f2;
+}
