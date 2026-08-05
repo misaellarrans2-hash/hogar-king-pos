@@ -82,6 +82,9 @@ class Usuario(UserMixin, db.Model):
     def puede_registrar_movimientos(self):
         return self.rol.nombre in (Rol.SUPERADMIN, Rol.ADMINSEDE, Rol.BODEGUERO)
 
+    def puede_vender(self):
+        return self.rol.nombre in (Rol.SUPERADMIN, Rol.ADMINSEDE, Rol.CAJERO)
+
     def sedes_visibles(self):
         """Sedes cuyo inventario puede consultar este usuario."""
         if self.ve_todas_las_sedes():
@@ -185,3 +188,58 @@ class HistorialPrecio(db.Model):
 
     def __repr__(self):
         return f"<HistorialPrecio producto={self.producto_id} {self.precio_anterior}->{self.precio_nuevo}>"
+
+
+class Factura(db.Model):
+    __tablename__ = "facturas"
+
+    EFECTIVO = "EFECTIVO"
+    DATAFONO = "DATAFONO"
+    TRANSFERENCIA = "TRANSFERENCIA"
+    CREDITO = "CREDITO"
+    FORMAS_PAGO = (EFECTIVO, DATAFONO, TRANSFERENCIA, CREDITO)
+
+    COMPLETADA = "COMPLETADA"
+    ANULADA = "ANULADA"
+
+    id = db.Column(db.Integer, primary_key=True)
+    numero = db.Column(db.Integer, nullable=False)
+    sede_id = db.Column(db.Integer, db.ForeignKey("sedes.id"), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
+    cliente_referencia = db.Column(db.String(120))
+    subtotal = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    descuento_total = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    total = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    forma_pago = db.Column(db.String(20), nullable=False)
+    estado = db.Column(db.String(15), nullable=False, default=COMPLETADA)
+    anulada_por_id = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
+    anulada_en = db.Column(db.DateTime)
+    creado_en = db.Column(db.DateTime, default=datetime.utcnow)
+
+    sede = db.relationship("Sede")
+    usuario = db.relationship("Usuario", foreign_keys=[usuario_id])
+    anulada_por = db.relationship("Usuario", foreign_keys=[anulada_por_id])
+    items = db.relationship("FacturaItem", back_populates="factura", cascade="all, delete-orphan")
+
+    __table_args__ = (db.UniqueConstraint("sede_id", "numero", name="uq_factura_sede_numero"),)
+
+    def __repr__(self):
+        return f"<Factura {self.sede_id}-{self.numero} {self.estado}>"
+
+
+class FacturaItem(db.Model):
+    __tablename__ = "factura_items"
+
+    id = db.Column(db.Integer, primary_key=True)
+    factura_id = db.Column(db.Integer, db.ForeignKey("facturas.id"), nullable=False)
+    producto_id = db.Column(db.Integer, db.ForeignKey("productos.id"), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False)
+    precio_unitario = db.Column(db.Numeric(12, 2), nullable=False)
+    descuento_pct = db.Column(db.Numeric(5, 2), nullable=False, default=0)
+    subtotal_linea = db.Column(db.Numeric(12, 2), nullable=False)
+
+    factura = db.relationship("Factura", back_populates="items")
+    producto = db.relationship("Producto")
+
+    def __repr__(self):
+        return f"<FacturaItem factura={self.factura_id} producto={self.producto_id} x{self.cantidad}>"

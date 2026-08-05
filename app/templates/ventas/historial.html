@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Historial de ventas - Hogar King POS{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h2 class="mb-0">Historial de ventas</h2>
+  {% if sedes_visibles|length > 1 %}
+  <form method="get" class="d-flex align-items-center gap-2">
+    <select name="sede_id" class="form-select" onchange="this.form.submit()">
+      {% for s in sedes_visibles %}
+      <option value="{{ s.id }}">{{ s.nombre }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  {% endif %}
+</div>
+
+{% if not facturas %}
+<div class="alert alert-info">Todavia no hay ventas registradas.</div>
+{% else %}
+<div class="table-responsive">
+  <table class="table table-hover bg-white align-middle">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Fecha</th>
+        <th>Cajero</th>
+        <th class="text-end">Total</th>
+        <th>Forma de pago</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in facturas %}
+      <tr class="{{ 'table-secondary' if f.estado == 'ANULADA' else '' }}">
+        <td>{{ f.numero }}</td>
+        <td>{{ f.creado_en.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td>{{ f.usuario.nombre_completo }}</td>
+        <td class="text-end">${{ "%.2f"|format(f.total) }}</td>
+        <td>{{ f.forma_pago }}</td>
+        <td>
+          <span class="badge {{ 'bg-danger' if f.estado == 'ANULADA' else 'bg-success' }}">{{ f.estado }}</span>
+        </td>
+        <td><a href="{{ url_for('ventas.ver_factura', factura_id=f.id) }}">Ver</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<a href="{{ url_for('ventas.nueva') }}">Volver a vender</a>
+{% endblock %}

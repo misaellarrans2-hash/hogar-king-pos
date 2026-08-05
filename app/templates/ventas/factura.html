@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Factura #{{ factura.numero }} - Hogar King POS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+  <h2 class="mb-0">Factura #{{ factura.numero }}</h2>
+  <div class="d-flex gap-2">
+    <button onclick="window.print()" class="btn btn-primary">Imprimir</button>
+    {% if factura.estado == "COMPLETADA" %}
+    <form method="post" action="{{ url_for('ventas.anular_factura', factura_id=factura.id) }}"
+          onsubmit="return confirm('Seguro que quieres anular esta factura? Se devolvera el stock.');">
+      <button type="submit" class="btn btn-outline-danger">Anular</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if factura.estado == "ANULADA" %}
+<div class="alert alert-danger no-print">
+  Esta factura fue anulada por {{ factura.anulada_por.nombre_completo }} el {{ factura.anulada_en.strftime("%Y-%m-%d %H:%M") }}.
+</div>
+{% endif %}
+
+<div class="recibo mx-auto bg-white p-3 shadow-sm">
+  <div class="text-center mb-2">
+    <h4 class="mb-0">Hogar King</h4>
+    <small>{{ factura.sede.nombre }}</small><br>
+    <small>{{ factura.creado_en.strftime("%Y-%m-%d %H:%M") }}</small>
+  </div>
+  <hr>
+  <div class="d-flex justify-content-between"><span>Factura</span><strong>#{{ factura.numero }}</strong></div>
+  <div class="d-flex justify-content-between"><span>Atendido por</span><span>{{ factura.usuario.nombre_completo }}</span></div>
+  {% if factura.cliente_referencia %}
+  <div class="d-flex justify-content-between"><span>Cliente</span><span>{{ factura.cliente_referencia }}</span></div>
+  {% endif %}
+  <hr>
+  {% for item in factura.items %}
+  <div class="d-flex justify-content-between">
+    <span>{{ item.cantidad }} x {{ item.producto.nombre }}</span>
+    <span>${{ "%.2f"|format(item.subtotal_linea) }}</span>
+  </div>
+  {% endfor %}
+  <hr>
+  <div class="d-flex justify-content-between"><span>Subtotal</span><span>${{ "%.2f"|format(factura.subtotal) }}</span></div>
+  {% if factura.descuento_total %}
+  <div class="d-flex justify-content-between"><span>Descuento</span><span>-${{ "%.2f"|format(factura.descuento_total) }}</span></div>
+  {% endif %}
+  <div class="d-flex justify-content-between fs-5"><strong>Total</strong><strong>${{ "%.2f"|format(factura.total) }}</strong></div>
+  <div class="d-flex justify-content-between"><span>Forma de pago</span><span>{{ factura.forma_pago }}</span></div>
+  <hr>
+  <p class="text-center small mb-0">Gracias por su compra</p>
+</div>
+
+<div class="text-center mt-3 no-print">
+  <a href="{{ url_for('ventas.nueva') }}" class="btn btn-outline-secondary">Nueva venta</a>
+</div>
+
+<style>
+  .recibo { max-width: 320px; font-family: monospace; }
+  @media print {
+    .no-print { display: none !important; }
+    nav { display: none !important; }
+    .recibo { max-width: 80mm; box-shadow: none !important; }
+  }
+</style>
+{% endblock %}
