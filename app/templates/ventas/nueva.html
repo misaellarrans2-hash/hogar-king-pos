@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Nueva venta - Hogar King POS{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-12 col-lg-7">
+    <h2 class="mb-3">Nueva venta</h2>
+
+    <form method="post" action="{{ url_for('ventas.agregar_al_carrito') }}" class="card shadow-sm mb-3">
+      <div class="card-body p-3">
+        <div class="row g-2 align-items-end">
+          <div class="col-7">
+            <label class="form-label">Codigo del producto</label>
+            <input type="text" name="codigo" id="codigo" class="form-control form-control-lg"
+                   placeholder="Escanea o escribe el codigo" required autofocus>
+          </div>
+          <div class="col-3">
+            <label class="form-label">Cantidad</label>
+            <input type="number" name="cantidad" class="form-control form-control-lg" value="1" min="1" required>
+          </div>
+          <div class="col-2">
+            <button type="submit" class="btn btn-lg w-100 text-white" style="background-color:#7a1f1f;">+</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    {% if lineas %}
+    <div class="table-responsive">
+      <table class="table bg-white align-middle">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th class="text-end">Cant.</th>
+            <th class="text-end">Precio</th>
+            <th class="text-end">Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for linea in lineas %}
+          <tr>
+            <td>{{ linea.producto.nombre }}</td>
+            <td class="text-end">{{ linea.cantidad }}</td>
+            <td class="text-end">${{ "%.2f"|format(linea.precio_unitario) }}</td>
+            <td class="text-end">${{ "%.2f"|format(linea.subtotal_linea) }}</td>
+            <td class="text-end">
+              <form method="post" action="{{ url_for('ventas.quitar_del_carrito', producto_id=linea.producto.id) }}">
+                <button type="submit" class="btn btn-sm btn-outline-danger">Quitar</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <form method="post" action="{{ url_for('ventas.vaciar_carrito') }}">
+      <button type="submit" class="btn btn-outline-secondary btn-sm">Vaciar carrito</button>
+    </form>
+    {% else %}
+    <div class="alert alert-info">El carrito esta vacio. Escanea o escribe un codigo para empezar.</div>
+    {% endif %}
+  </div>
+
+  <div class="col-12 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h4 class="mb-3">Resumen</h4>
+        <div class="d-flex justify-content-between mb-3 fs-4">
+          <span>Subtotal</span>
+          <strong>${{ "%.2f"|format(subtotal) }}</strong>
+        </div>
+
+        <form method="post" action="{{ url_for('ventas.finalizar') }}">
+          <div class="mb-3">
+            <label class="form-label">Descuento (%)</label>
+            <input type="number" name="descuento_pct" class="form-control form-control-lg" value="0" min="0" max="100" step="0.1">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Cliente (opcional)</label>
+            <input type="text" name="cliente_referencia" class="form-control form-control-lg" placeholder="Nombre o telefono">
+          </div>
+          <div class="mb-4">
+            <label class="form-label">Forma de pago</label>
+            <select name="forma_pago" class="form-select form-select-lg" required>
+              {% for forma in formas_pago %}
+              <option value="{{ forma }}">{{ forma.capitalize() }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-lg w-100 text-white" style="background-color:#1e7a3a;" {{ "disabled" if not lineas else "" }}>
+            Finalizar venta
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="mt-3 text-center">
+      <a href="{{ url_for('ventas.historial') }}">Ver historial de ventas</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Devuelve el foco al campo de codigo despues de cada accion, para
+  // que el cajero pueda seguir escaneando sin tener que hacer clic.
+  document.getElementById("codigo").focus();
+</script>
+{% endblock %}

@@ -27,6 +27,14 @@
         </div>
       </div>
     </a>
+    {% elif "Ventas y Caja" in modulo %}
+    <a href="{{ url_for('ventas.nueva') }}" class="text-decoration-none">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-0 text-dark">{{ modulo }}</h5>
+        </div>
+      </div>
+    </a>
     {% else %}
     <div class="card h-100 border-0 shadow-sm">
       <div class="card-body">

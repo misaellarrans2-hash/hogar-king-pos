@@ -47,12 +47,21 @@ correctos, y visibilidad entre las 2 sedes.
 - [x] Historial de cambios de precio (auditoria: quien y cuando)
 - [x] Reglas de permisos aplicadas: solo SUPERADMIN ve costos; BODEGUERO no ve precios; CAJERO no entra al inventario
 
+**PR #3 — Facturación**
+- [x] Venta rapida: agregar productos por codigo de barras, carrito en pantalla
+- [x] 4 formas de pago: Efectivo, Datafono, Transferencia, Credito
+- [x] Descuento porcentual sobre la venta
+- [x] La venta descuenta el stock de la sede automaticamente
+- [x] Recibo imprimible (formato angosto tipo tiquete 80mm, boton "Imprimir")
+- [x] Anulacion de facturas: devuelve el stock y queda registrado quien y cuando la anulo
+- [x] Historial de ventas por sede
+- [x] Permisos: solo SUPERADMIN, ADMINSEDE y CAJERO venden; un CAJERO solo puede anular sus propias facturas
+
 ## Próximos PRs (en orden)
 
-1. Facturación: venta rápida, código de barras, formas de pago
-2. Cierre de caja y arqueo
-3. Consulta y solicitud de traslado entre sedes
-4. Reportes, dashboard, proveedores, clientes y el resto de funciones
+1. Cierre de caja y arqueo
+2. Consulta y solicitud de traslado entre sedes
+3. Reportes, dashboard, proveedores, clientes y el resto de funciones
 
 > Nota sobre infraestructura: hoy el sistema corre en 1 sola PC (pensado para
 > la demo). Si la empresa aprueba el proyecto, el paso de "varias cajas por
