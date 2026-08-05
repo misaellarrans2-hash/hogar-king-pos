@@ -7,7 +7,7 @@ Uso:
 
 from app import create_app
 from app.extensions import db
-from app.models import Rol, Sede, Usuario
+from app.models import Producto, Rol, Sede, Stock, Usuario
 
 ROLES = [
     (Rol.SUPERADMIN, "Dueño. Control total de las 2 sedes, ve costos y ganancias."),
@@ -33,6 +33,21 @@ USUARIOS_DEMO = [
     ("bodeguero_lalucha", "Bodeguero Sede La Lucha", Rol.BODEGUERO, "Sede La Lucha"),
     ("asesor_centro", "Asesor Sede Centro", Rol.ASESOR, "Sede Centro"),
     ("asesor_lalucha", "Asesor Sede La Lucha", Rol.ASESOR, "Sede La Lucha"),
+]
+
+
+# (codigo, nombre, precio_venta, costo, {nombre_sede: (cantidad, stock_minimo)})
+PRODUCTOS_DEMO = [
+    ("7701234560012", "Resma de papel carta x500", 18000, 12000,
+     {"Sede Centro": (40, 10), "Sede La Lucha": (5, 10)}),
+    ("7701234560029", "Caja de lapices x12", 9500, 6000,
+     {"Sede Centro": (25, 5), "Sede La Lucha": (30, 5)}),
+    ("7701234560036", "Cuaderno cosido 100 hojas", 6500, 4000,
+     {"Sede Centro": (60, 15), "Sede La Lucha": (18, 15)}),
+    ("7701234560043", "Televisor 32 pulgadas Smart", 950000, 720000,
+     {"Sede Centro": (3, 1)}),  # solo hay en Sede Centro, a proposito
+    ("7701234560050", "Juego de sabanas doble", 85000, 55000,
+     {"Sede La Lucha": (12, 3)}),  # solo hay en Sede La Lucha, a proposito
 ]
 
 
@@ -70,6 +85,20 @@ def seed():
             )
             usuario.set_password(username)  # demo: la contraseña es igual al usuario
             db.session.add(usuario)
+
+        for codigo, nombre, precio_venta, costo, stock_por_sede in PRODUCTOS_DEMO:
+            producto = Producto.query.filter_by(codigo=codigo).first()
+            if producto is None:
+                producto = Producto(codigo=codigo, nombre=nombre, precio_venta=precio_venta, costo=costo)
+                db.session.add(producto)
+                db.session.flush()
+
+            for nombre_sede, (cantidad, stock_minimo) in stock_por_sede.items():
+                sede = sedes_por_nombre[nombre_sede]
+                if producto.stock_en(sede.id) is None:
+                    db.session.add(
+                        Stock(producto_id=producto.id, sede_id=sede.id, cantidad=cantidad, stock_minimo=stock_minimo)
+                    )
 
         db.session.commit()
 

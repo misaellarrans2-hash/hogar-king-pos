@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Historial de precios - Hogar King POS{% endblock %}
+{% block content %}
+<h2 class="mb-4">Historial de cambios de precio</h2>
+
+{% if not cambios %}
+<div class="alert alert-info">Todavia no se ha modificado ningun precio.</div>
+{% else %}
+<div class="table-responsive">
+  <table class="table table-hover bg-white">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Producto</th>
+        <th class="text-end">Precio anterior</th>
+        <th class="text-end">Precio nuevo</th>
+        <th>Cambiado por</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in cambios %}
+      <tr>
+        <td>{{ c.creado_en.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td>{{ c.producto.nombre }} ({{ c.producto.codigo }})</td>
+        <td class="text-end">${{ "%.2f"|format(c.precio_anterior) }}</td>
+        <td class="text-end">${{ "%.2f"|format(c.precio_nuevo) }}</td>
+        <td>{{ c.usuario.nombre_completo }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<a href="{{ url_for('main.dashboard') }}">Volver al inicio</a>
+{% endblock %}
