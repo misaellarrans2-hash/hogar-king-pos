@@ -28,8 +28,9 @@ correctos, y visibilidad entre las 2 sedes.
 | BODEGUERO | Inventario, entradas, traslados de su sede | Precios, ventas | Cuidar la mercancía |
 | ASESOR | Precios y stock de su sede | Costos, ventas | Atender y cotizar clientes |
 
-## Estado actual (PR #1)
+## Estado actual
 
+**PR #1 — Esqueleto, base de datos, login y permisos**
 - [x] Esqueleto del proyecto (Flask + SQLAlchemy + Bootstrap 5, sin depender de internet)
 - [x] Base de datos: Sede, Rol, Usuario
 - [x] Login y sesiones
@@ -37,13 +38,21 @@ correctos, y visibilidad entre las 2 sedes.
 - [x] Datos de ejemplo (2 sedes, 5 roles, 9 usuarios demo) para poder mostrar el sistema
 - [x] Script de respaldo simple de la base de datos
 
+**PR #2 — Inventario**
+- [x] Productos y stock por sede (un mismo producto puede existir en 1 o las 2 sedes, con cantidades distintas)
+- [x] Registrar entradas y salidas, con formulario grande pensado para celular (pistola de codigo de barras o escritura manual)
+- [x] Alerta visual de stock bajo
+- [x] Historial de movimientos de inventario por sede
+- [x] Importar productos desde Excel (crea o actualiza por codigo)
+- [x] Historial de cambios de precio (auditoria: quien y cuando)
+- [x] Reglas de permisos aplicadas: solo SUPERADMIN ve costos; BODEGUERO no ve precios; CAJERO no entra al inventario
+
 ## Próximos PRs (en orden)
 
-1. Inventario: productos, stock por sede, entradas y salidas — con vista adaptada a celular para el bodeguero
-2. Facturación: venta rápida, código de barras, formas de pago
-3. Cierre de caja y arqueo
-4. Consulta y solicitud de traslado entre sedes
-5. Reportes, dashboard, proveedores, clientes y el resto de funciones
+1. Facturación: venta rápida, código de barras, formas de pago
+2. Cierre de caja y arqueo
+3. Consulta y solicitud de traslado entre sedes
+4. Reportes, dashboard, proveedores, clientes y el resto de funciones
 
 > Nota sobre infraestructura: hoy el sistema corre en 1 sola PC (pensado para
 > la demo). Si la empresa aprueba el proyecto, el paso de "varias cajas por

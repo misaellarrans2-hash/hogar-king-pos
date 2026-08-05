@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Historial de movimientos - Hogar King POS{% endblock %}
+{% block content %}
+<h2 class="mb-1">Historial de entradas y salidas</h2>
+<p class="text-muted mb-4">{{ sede.nombre if sede else "" }}</p>
+
+{% if not movimientos %}
+<div class="alert alert-info">Todavia no hay movimientos registrados en esta sede.</div>
+{% else %}
+<div class="table-responsive">
+  <table class="table table-hover bg-white">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Tipo</th>
+        <th>Producto</th>
+        <th class="text-end">Cantidad</th>
+        <th>Motivo</th>
+        <th>Usuario</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in movimientos %}
+      <tr>
+        <td>{{ m.creado_en.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td>
+          <span class="badge {{ 'bg-success' if m.tipo == 'ENTRADA' else 'bg-danger' }}">{{ m.tipo }}</span>
+        </td>
+        <td>{{ m.producto.nombre }} ({{ m.producto.codigo }})</td>
+        <td class="text-end">{{ m.cantidad }}</td>
+        <td>{{ m.motivo }}</td>
+        <td>{{ m.usuario.nombre_completo }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<a href="{{ url_for('inventario.listar', sede_id=sede.id if sede else None) }}">Volver al inventario</a>
+{% endblock %}

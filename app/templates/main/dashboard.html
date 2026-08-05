@@ -19,12 +19,34 @@
 <div class="row g-3">
   {% for modulo in modulos %}
   <div class="col-12 col-sm-6 col-lg-4">
+    {% if "Inventario" in modulo %}
+    <a href="{{ url_for('inventario.listar') }}" class="text-decoration-none">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-0 text-dark">{{ modulo }}</h5>
+        </div>
+      </div>
+    </a>
+    {% else %}
     <div class="card h-100 border-0 shadow-sm">
       <div class="card-body">
         <h5 class="card-title mb-0">{{ modulo }}</h5>
       </div>
     </div>
+    {% endif %}
   </div>
   {% endfor %}
+
+  {% if current_user.puede_editar_productos() %}
+  <div class="col-12 col-sm-6 col-lg-4">
+    <a href="{{ url_for('inventario.historial_precios') }}" class="text-decoration-none">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-0 text-dark">Historial de precios (auditoria)</h5>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}
